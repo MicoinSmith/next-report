@@ -2,7 +2,7 @@ name: Deploy to Server
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
   workflow_dispatch: {}
 
 jobs:
@@ -33,31 +33,7 @@ jobs:
         run: |
           yarn build
 
-      - name: Pack artifact
-        run: |
-          APP_NAME=next-report
-          PKG_NAME="$APP_NAME-$(date +%Y%m%d_%H%M%S).tar.gz"
-          mkdir -p _deploy_tmp
-          cp -r .next _deploy_tmp/.next
-          if [ -d public ]; then cp -r public _deploy_tmp/public; fi
-          cp package.json _deploy_tmp/
-          if [ -f yarn.lock ]; then cp yarn.lock _deploy_tmp/; fi
-          if [ -f next.config.mjs ]; then cp next.config.mjs _deploy_tmp/; fi
-          if [ -f .env.production ]; then cp .env.production _deploy_tmp/.env; fi
-          tar --no-xattrs -czf "$PKG_NAME" -C _deploy_tmp .
-          echo "PKG_NAME=$PKG_NAME" >> $GITHUB_ENV
-
-      - name: Upload package to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          source: ${{ env.PKG_NAME }}
-          target: ${{ secrets.DEPLOY_DIR }}
-
-      - name: Remote deploy
+      - name: Remote deploy (pull and PM2)
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -68,15 +44,16 @@ jobs:
             set -e
             APP_NAME=${{ secrets.APP_NAME || 'next-report' }}
             DEPLOY_DIR=${{ secrets.DEPLOY_DIR }}
-            PKG_NAME=${{ env.PKG_NAME }}
+            GIT_BRANCH=${{ secrets.GIT_BRANCH || 'develop' }}
             cd "$DEPLOY_DIR"
-            rm -rf .next node_modules public || true
-            tar -xzf "$PKG_NAME"
-            rm -f "$PKG_NAME" || true
+            git fetch --all
+            git checkout "$GIT_BRANCH"
+            git pull --rebase origin "$GIT_BRANCH"
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             corepack enable || true
-            yarn install --production --frozen-lockfile || yarn install --production
+            yarn install --immutable || yarn install
+            NODE_ENV=production yarn build
             if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
               pm2 restart "$APP_NAME"
             else
