@@ -44,7 +44,7 @@ jobs:
             set -e
             APP_NAME=${{ secrets.APP_NAME || 'next-report' }}
             DEPLOY_DIR=${{ secrets.DEPLOY_DIR }}
-            GIT_BRANCH=${{ secrets.GIT_BRANCH || 'develop' }}
+            GIT_BRANCH=${{ secrets.GIT_BRANCH || 'master' }}
             cd "$DEPLOY_DIR"
             git fetch --all
             git checkout "$GIT_BRANCH"
