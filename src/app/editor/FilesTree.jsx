@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
+import { useTheme } from "@/hooks/useTheme";
 import UploadInput from "./UploadInput";
 
 // 结点结构: { id: string, name: string, type: 'file'|'folder', children?: Node[] }
 export default function FilesTree({ tree = [], onSelect }) {
+  const { theme, setTheme, mounted } = useTheme(); // 现在可以访问主题，用于将来扩展功能
   const [expanded, setExpanded] = useState(() => new Set());
 
   const toggle = (id) => {
@@ -19,8 +21,8 @@ export default function FilesTree({ tree = [], onSelect }) {
 
   return (
     <div className="text-sm select-none">
-      <div className="flex items-center justify-between border-b pb-2 border-neutral-200 dark:border-neutral-800">
-        <p>文件总数 {tree.length}</p>
+      <div className="flex items-center justify-between border-b pb-2 border-gray-200 dark:border-neutral-800">
+        <p>文件总数: {tree.length}</p>
         <UploadInput />
       </div>
       {tree.length === 0 ? (

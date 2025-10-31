@@ -1,11 +1,9 @@
 import axios from 'axios';
 import { getCookie } from 'cookies-next';
-import { showToast } from '@/lib/toast';
-import { createLoginUrl } from '@/lib/redirect';
 
-const COZE_API_URL = process.env.NEXT_PUBLIC_COZE_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export default function httpCreator( { baseURL = '/baseApi', timeout = 1000 * 60 * 1, headers = {} } ) {
+export default function httpCreator( { baseURL = '/api', timeout = 1000 * 60 * 1, headers = {} } ) {
     const defaultHeaders = {
         'Content-Type': 'application/json',
         credentials: 'include',
@@ -17,48 +15,10 @@ export default function httpCreator( { baseURL = '/baseApi', timeout = 1000 * 60
         headers: defaultHeaders,
     } );
 
-    // 检查用户信息是否存在
-    const checkUserInfo = () => {
-        const userInfo = localStorage.getItem( 'userInfo' );
-        const token = getCookie( 'SA-TOKEN' );
-
-        if ( !userInfo || !token ) {
-            console.log( '用户信息或token不存在，跳转登录页' );
-            // 清除所有相关数据
-            localStorage.removeItem( 'userInfo' );
-
-            // 跳转登录页
-            const loginUrl = createLoginUrl();
-            window.location.href = loginUrl;
-            return false;
-        }
-
-        // 验证userInfo是否为有效的JSON
-        const parsedUserInfo = JSON.parse( userInfo );
-        if ( !parsedUserInfo.id || !parsedUserInfo.userAccount ) {
-            console.log( '用户信息格式无效，跳转登录页' );
-            localStorage.removeItem( 'userInfo' );
-
-            const loginUrl = createLoginUrl();
-            window.location.href = loginUrl;
-            return false;
-        }
-
-        return true;
-    };
-
     // 请求拦截器
     HTTP.interceptors.request.use(
         config => {
-            const currentToken = getCookie( 'SA-TOKEN' );
-            if ( currentToken ) {
-                config.headers['token'] = currentToken;
-                // config.headers['SA-TOKEN'] = currentToken;
-                // config.headers = {
-                // 	...config.headers,
-                // 	...headers
-                // }
-            }
+            config.headers['Authorization'] = null;
             return config;
         },
         error => {
@@ -83,23 +43,27 @@ export default function httpCreator( { baseURL = '/baseApi', timeout = 1000 * 60
                 if ( errorCodeStatus === 401 ) {
                     // 未授权，跳转登录
                     console.log( '401 unauthorized, 清除用户数据并跳转登录页' );
-                    localStorage.removeItem( 'userInfo' );
-
-                    const loginUrl = createLoginUrl();
-                    console.log( '跳转登录页，当前页面:', window.location.href );
-                    window.location.href = loginUrl;
                 }
             } else {
-                // 检查是否存在userInfo
-                // if (!checkUserInfo() && window.location.pathname !== '/login') {
-                // 	return Promise.reject(new Error('用户未登录'));
-                // }
             }
 
             // 显示错误信息
-            const errorMessage =
-                error.response?.data?.message || error.response?.data?.msg || error.message || '请求失败';
-            showToast.error( errorMessage );
+            let errorMessage = '请求失败';
+
+            if (errorCodeStatus === 404) {
+                errorMessage = '接口不存在，请检查 API 地址配置或后端服务是否运行';
+            } else if (errorCodeStatus === 500) {
+                errorMessage = error.response?.data?.message || error.response?.data?.msg || '服务器错误';
+            } else if (errorCodeStatus) {
+                errorMessage = error.response?.data?.message || error.response?.data?.msg || error.message || `请求失败 (${errorCodeStatus})`;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            // 只在客户端环境下显示消息提示，且确保消息不为空
+            if (typeof window !== 'undefined' && Message?.error && errorMessage) {
+                Message.error( errorMessage );
+            }
 
             // return Promise.reject(error);
             return Promise.resolve( error );
@@ -113,7 +77,7 @@ export default function httpCreator( { baseURL = '/baseApi', timeout = 1000 * 60
     const DEL = ( HTTP.del = ( url, config ) => HTTP.request( { ...config, method: 'DELETE', url } ) );
     // GET SSE (EventSource)
     const sseGet = ( HTTP.sseGet = ( url, callbacks ) => {
-        const es = new EventSource( baseURL + url );
+        const es = new EventSource( `${API_URL}${url}` );
 
         es.onmessage = event => {
             callbacks.onMessage?.( event.data );
@@ -131,8 +95,7 @@ export default function httpCreator( { baseURL = '/baseApi', timeout = 1000 * 60
     const ssePost = ( HTTP.ssePost = async ( url, body, callbacks ) => {
 
         // sse 不能经过nextconfig的rewrites 否则无法逐步获取sse流
-        // const TargetUrl = `${baseURL}${url}`
-        const TargetUrl = `${COZE_API_URL}/v1${url}`
+        const TargetUrl = `${API_URL}${url}`
 
         try {
             const res = await fetch( TargetUrl, {
@@ -180,8 +143,11 @@ export default function httpCreator( { baseURL = '/baseApi', timeout = 1000 * 60
                             try {
                                 eventData.data = JSON.parse(line.replace("data:", "").trim())
                             } catch (error) {
-                                new Error("Parse error 请手动检查.", JSON.parse(line.replace("data:", "").trim()))
-                                showToast.error("Parse error 请手动检查.")
+                                console.error("Parse error 请手动检查.", error);
+                                // 只在客户端环境下显示消息提示
+                                if (typeof window !== 'undefined' && Message?.error) {
+                                    Message.error("Parse error 请手动检查.");
+                                }
                             }
                         }
                     })

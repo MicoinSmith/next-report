@@ -1,46 +1,58 @@
 import { useState } from "react";
-import Tabs from "@/components/ui/Tabs";
-import { FileText, Search } from "lucide-react";
+import { Edit, FileText, Search } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 import FilesTree from "./FilesTree";
+import { Button, Tabs, Input } from "@/components/ui";
 
-export default () => {
-	const [activeTab, setActiveTab] = useState("文件列表");
+export default ({ onGenerate }) => {
+	const { theme, setTheme, mounted } = useTheme(); // 现在可以访问主题，用于将来扩展功能
+	const [activeTab, setActiveTab] = useState( "文件列表" );
+
 	return (
-		<div className="w-[280px] shrink-0 px-4 py-2 border-r dark:border-neutral-800 flex flex-col justify-between">
-			<div className="space-y-4">
-				<Tabs defaultValue="文件列表" onValueChange={setActiveTab} indicatorBasis="trigger">
-					<Tabs.List>
+		<div className="w-[280px] shrink-0 h-full border-r border-gray-200 dark:border-neutral-800 flex flex-col">
+			<div className="flex-1 overflow-y-auto px-4 py-2">
+				<Tabs defaultValue="文件列表" onValueChange={ setActiveTab } indicatorBasis="trigger">
+					<Tabs.List align="center">
 						<Tabs.Trigger value="文件列表" className="flex items-center gap-2 text-md">
-							<FileText size={16} />
-							<span>文件列表</span>
+							<FileText size={ 16 } />
+						</Tabs.Trigger>
+						<Tabs.Trigger value="编辑">
+							<Edit size={ 16 } />
 						</Tabs.Trigger>
 						<Tabs.Trigger value="网络搜索" className="flex items-center gap-2 text-md">
-							<Search size={16} />
-							<span>联网搜索</span>
+							<Search size={ 16 } />
 						</Tabs.Trigger>
 					</Tabs.List>
-					<Tabs.Pane value="文件列表">
-						<FilesTree />
-					</Tabs.Pane>
-					<Tabs.Pane value="网络搜索">
-						<input className="w-full rounded-md border p-2 text-sm dark:border-neutral-800" placeholder="关键词 / 语言 / 结果数" />
-					</Tabs.Pane>
+					<div className="mt-4">
+						<Tabs.Pane value="文件列表">
+							<FilesTree />
+						</Tabs.Pane>
+						<Tabs.Pane value="编辑">
+							<div className="dark:border-neutral-800 pt-2">
+								<div className="space-y-3 flex flex-col gap-1">
+									<Button variant="outline" size="sm" onClick={() => onGenerate('generatePlan')}>
+										生成章节树
+									</Button>
+									<Button variant="outline" size="sm" onClick={() => onGenerate('generateMaterial')}>
+										批量生成
+									</Button>
+									<Button variant="outline" size="sm" onClick={() => onGenerate('synthesizeArticle')}>
+										一键整篇插入
+									</Button>
+								</div>
+							</div>
+						</Tabs.Pane>
+						<Tabs.Pane value="网络搜索">
+							<div className="flex flex-col gap-2">
+								<label className="text-sm text-neutral-500">联网搜索</label>
+								<div className={`flex items-center gap-2 border rounded-md p-1 pr-2 mt-2 ${theme === "dark" ? "border-neutral-800" : "border-gray-200"}`}>
+									<Input variant="ghost" size="default" className="w-full !px-2 !py-0" placeholder="关键词 / 语言 / 结果数" />
+									<Search size={20} className={`text-neutral-500 cursor-pointer ${theme === "dark" ? "text-neutral-400" : "text-neutral-500"}`} />
+								</div>
+							</div>
+						</Tabs.Pane>
+					</div>
 				</Tabs>
-			</div>
-
-			<div className="dark:border-neutral-800 pt-4">
-				<h2 className="mb-2 mt-6 text-sm font-semibold">生成大纲</h2>
-				<div className="space-y-2">
-					<button className="w-full rounded-md border px-3 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-900 cursor-pointer">
-						生成章节树（占位）
-					</button>
-					<button className="w-full rounded-md border px-3 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-900 cursor-pointer">
-						批量生成（占位）
-					</button>
-					<button className="w-full rounded-md border px-3 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-900 cursor-pointer">
-						一键整篇插入（占位）
-					</button>
-				</div>
 			</div>
 		</div>
 	);
