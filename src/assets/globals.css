@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* 白色主题（默认） */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,14 +13,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* class 策略的暗色模式（next-themes） */
+/* 黑色主题 */
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
@@ -29,4 +23,577 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* MDEditor 主题支持 - 强制覆盖默认样式 */
+.wmde-markdown,
+.wmde-markdown * {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown-editor,
+.wmde-markdown-editor * {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown-editor {
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+.dark .wmde-markdown-editor {
+  border-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+/* 覆盖 MDEditor 默认的深色样式 */
+:not(.dark) .wmde-markdown-editor {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+:not(.dark) .wmde-markdown {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-text-pre,
+.wmde-markdown-editor .w-md-editor-text-input {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+:not(.dark) .wmde-markdown-editor .w-md-editor-text-pre,
+:not(.dark) .wmde-markdown-editor .w-md-editor-text-input {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-text-pre * {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-bar {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+:not(.dark) .wmde-markdown-editor .w-md-editor-bar {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+.dark .wmde-markdown-editor .w-md-editor-bar {
+  border-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-text-textarea {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+:not(.dark) .wmde-markdown-editor .w-md-editor-text-textarea {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-text-textarea::placeholder {
+  color: rgb(156 163 175 / var(--tw-text-opacity, 1)) !important;
+}
+
+.dark .wmde-markdown-editor .w-md-editor-text-textarea::placeholder {
+  color: rgb(107 114 128 / var(--tw-text-opacity, 1)) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-text-pre code {
+  background: transparent !important;
+  color: var(--foreground) !important;
+}
+
+.dark .wmde-markdown-editor .w-md-editor-text-pre code {
+  background: transparent !important;
+  color: var(--foreground) !important;
+}
+
+/* 工具栏 */
+.w-md-editor-toolbar {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-bottom-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+:not(.dark) .w-md-editor-toolbar {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  border-bottom-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+.dark .w-md-editor-toolbar {
+  border-bottom-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-toolbar {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-bottom-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+:not(.dark) .wmde-markdown-editor .w-md-editor-toolbar {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  border-bottom-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+.dark .wmde-markdown-editor .w-md-editor-toolbar {
+  border-bottom-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+/* 工具栏内的所有元素 */
+.w-md-editor-toolbar *,
+.wmde-markdown-editor .w-md-editor-toolbar * {
+  color: var(--foreground) !important;
+}
+
+/* 编辑区域 */
+.w-md-editor-area {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+:not(.dark) .w-md-editor-area {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+.dark .w-md-editor-area {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+/* 输入区域 */
+.w-md-editor-input {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+:not(.dark) .w-md-editor-input {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+.dark .w-md-editor-input {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+/* 编辑区域内的所有元素 */
+.w-md-editor-area *,
+.w-md-editor-input * {
+  color: var(--foreground) !important;
+}
+
+/* 确保在 wmde-markdown-editor 容器内也生效 */
+.wmde-markdown-editor .w-md-editor-area,
+.wmde-markdown-editor .w-md-editor-input {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+:not(.dark) .wmde-markdown-editor .w-md-editor-area,
+:not(.dark) .wmde-markdown-editor .w-md-editor-input {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+.dark .wmde-markdown-editor .w-md-editor-area,
+.dark .wmde-markdown-editor .w-md-editor-input {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-toolbar-item button {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown-editor .w-md-editor-toolbar-item button svg {
+  color: var(--foreground) !important;
+}
+
+/* 分割线 */
+.wmde-markdown-editor .w-md-editor-divider {
+  background: rgb(229 231 235 / var(--tw-bg-opacity, 1)) !important;
+}
+
+.dark .wmde-markdown-editor .w-md-editor-divider {
+  background: rgb(38 38 38 / var(--tw-bg-opacity, 1)) !important;
+}
+
+/* 拖拽条 */
+.wmde-markdown-editor .w-md-editor-drag-handle {
+  background: rgb(229 231 235 / var(--tw-bg-opacity, 1)) !important;
+}
+
+.dark .wmde-markdown-editor .w-md-editor-drag-handle {
+  background: rgb(38 38 38 / var(--tw-bg-opacity, 1)) !important;
+}
+
+/* 预览区域 */
+.wmde-markdown {
+  background: var(--background) !important;
+}
+
+.wmde-markdown h1,
+.wmde-markdown h2,
+.wmde-markdown h3,
+.wmde-markdown h4,
+.wmde-markdown h5,
+.wmde-markdown h6,
+.wmde-markdown p,
+.wmde-markdown li {
+  color: var(--foreground) !important;
+}
+
+/* 列表标记（bullets 和 numbers）主题支持 */
+.wmde-markdown ul,
+.wmde-markdown ol {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown ul li::marker,
+.wmde-markdown ol li::marker {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown ul li::before {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown ol li::before {
+  color: var(--foreground) !important;
+}
+
+/* 确保列表项内的所有内容都是正确颜色 */
+.wmde-markdown ul li *,
+.wmde-markdown ol li * {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown code {
+  background: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: var(--foreground) !important;
+}
+
+.dark .wmde-markdown code {
+  background: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+:not(.dark) .wmde-markdown code {
+  background: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.wmde-markdown pre {
+  background: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .wmde-markdown pre {
+  background: rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+:not(.dark) .wmde-markdown pre {
+  background: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.wmde-markdown pre code {
+  background: transparent !important;
+}
+
+.wmde-markdown blockquote {
+  border-left-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+  color: var(--foreground) !important;
+}
+
+.dark .wmde-markdown blockquote {
+  border-left-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+.wmde-markdown table th,
+.wmde-markdown table td {
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+.dark .wmde-markdown table th,
+.dark .wmde-markdown table td {
+  border-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+/* 工具栏按钮 */
+.wmde-markdown-editor button {
+  color: var(--foreground) !important;
+}
+
+:not(.dark) .wmde-markdown-editor button:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .wmde-markdown-editor button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* highlight.js 代码高亮主题支持 */
+.wmde-markdown pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  color: var(--foreground) !important;
+}
+
+:not(.dark) .wmde-markdown pre code.hljs {
+  background: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .wmde-markdown pre code.hljs {
+  background: rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 代码高亮中的关键字、字符串等语法元素 */
+.wmde-markdown .hljs-keyword,
+.wmde-markdown .hljs-selector-tag,
+.wmde-markdown .hljs-literal,
+.wmde-markdown .hljs-title,
+.wmde-markdown .hljs-section,
+.wmde-markdown .hljs-doctag,
+.wmde-markdown .hljs-type,
+.wmde-markdown .hljs-name,
+.wmde-markdown .hljs-strong {
+  color: var(--foreground) !important;
+  font-weight: bold;
+}
+
+.wmde-markdown .hljs-comment,
+.wmde-markdown .hljs-quote {
+  color: rgb(107 114 128 / var(--tw-text-opacity, 1)) !important;
+  font-style: italic;
+}
+
+.dark .wmde-markdown .hljs-comment,
+.dark .wmde-markdown .hljs-quote {
+  color: rgb(156 163 175 / var(--tw-text-opacity, 1)) !important;
+}
+
+.wmde-markdown .hljs-string,
+.wmde-markdown .hljs-attr,
+.wmde-markdown .hljs-template-variable,
+.wmde-markdown .hljs-attribute,
+.wmde-markdown .hljs-regexp,
+.wmde-markdown .hljs-link {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown .hljs-number,
+.wmde-markdown .hljs-symbol,
+.wmde-markdown .hljs-bullet {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown .hljs-function .hljs-title,
+.wmde-markdown .hljs-params {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown .hljs-meta,
+.wmde-markdown .hljs-subst {
+  color: var(--foreground) !important;
+}
+
+/* 链接样式 */
+.wmde-markdown a {
+  color: var(--foreground) !important;
+  text-decoration: underline;
+}
+
+.wmde-markdown a:hover {
+  opacity: 0.8;
+}
+
+/* 水平线 */
+.wmde-markdown hr {
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+.dark .wmde-markdown hr {
+  border-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+/* 图片和图片占位符 */
+.wmde-markdown img {
+  background: transparent !important;
+}
+
+.wmde-markdown p img {
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* 数学公式 */
+.wmde-markdown .katex,
+.wmde-markdown .katex-display {
+  color: var(--foreground) !important;
+}
+
+.wmde-markdown .katex * {
+  color: inherit !important;
+}
+
+/* 脚注 */
+.wmde-markdown .footnote,
+.wmde-markdown .footnote-ref {
+  color: var(--foreground) !important;
+}
+
+/* 确保所有文本元素都使用正确的颜色 */
+.wmde-markdown * {
+  color: inherit;
+}
+
+.wmde-markdown strong,
+.wmde-markdown b {
+  color: var(--foreground) !important;
+  font-weight: bold;
+}
+
+.wmde-markdown em,
+.wmde-markdown i {
+  color: var(--foreground) !important;
+  font-style: italic;
+}
+
+.wmde-markdown del,
+.wmde-markdown s {
+  color: var(--foreground) !important;
+  text-decoration: line-through;
+}
+
+.wmde-markdown u {
+  color: var(--foreground) !important;
+  text-decoration: underline;
+}
+
+/* 编辑器页面 Header 样式 */
+.header {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-bottom-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+:not(.dark) .header {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  border-bottom-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+.dark .header {
+  border-bottom-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+/* Header 内的所有元素 */
+.header * {
+  color: var(--foreground) !important;
+}
+
+/* Menu 组件主题支持 */
+[data-radix-dropdown-menu-content] {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+:not(.dark) [data-radix-dropdown-menu-content] {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1)) !important;
+}
+
+.dark [data-radix-dropdown-menu-content] {
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  border-color: rgb(38 38 38 / var(--tw-border-opacity, 1)) !important;
+}
+
+/* Menu Item 样式 */
+[data-radix-dropdown-menu-item] {
+  color: var(--foreground) !important;
+}
+
+[data-radix-dropdown-menu-item]:hover,
+[data-radix-dropdown-menu-item]:focus {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark [data-radix-dropdown-menu-item]:hover,
+.dark [data-radix-dropdown-menu-item]:focus {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+:not(.dark) [data-radix-dropdown-menu-item]:hover,
+:not(.dark) [data-radix-dropdown-menu-item]:focus {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Menu Separator 样式 */
+[data-radix-dropdown-menu-separator] {
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1)) !important;
+}
+
+.dark [data-radix-dropdown-menu-separator] {
+  background-color: rgb(38 38 38 / var(--tw-bg-opacity, 1)) !important;
+}
+
+/* Menu Label 样式 */
+[data-radix-dropdown-menu-label] {
+  color: var(--foreground) !important;
+  opacity: 0.7;
+}
+
+.dark [data-radix-dropdown-menu-label] {
+  opacity: 0.6;
+}
+
+/* MDEditor 滚动修复 */
+.wmde-markdown-editor {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.wmde-markdown-editor .w-md-editor-area,
+.wmde-markdown-editor .w-md-editor-input {
+  height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.wmde-markdown-editor .w-md-editor-text-pre {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
 }

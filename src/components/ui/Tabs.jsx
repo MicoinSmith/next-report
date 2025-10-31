@@ -1,4 +1,7 @@
+"use client";
+
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useTheme } from "@/hooks/useTheme";
 
 const TabsContext = createContext(null);
 
@@ -60,28 +63,52 @@ function Root({ defaultValue, value: controlledValue, onValueChange, indicatorBa
   return <TabsContext.Provider value={ctx}>{children}</TabsContext.Provider>;
 }
 
-function List({ children }) {
+function List({ children, align = "start", theme: themeProp }) {
   const { refs, indicator } = useContext(TabsContext);
+  const { theme: globalTheme } = useTheme(); // 自定义 hook 自动处理 SSR，SSR 时返回 "light"
+  const theme = themeProp || globalTheme || "light";
+
+  const alignClasses = {
+    start: "justify-start",
+    center: "justify-center",
+    end: "justify-end",
+  };
+
   return (
-    <div ref={refs.containerRef} className="relative flex gap-2 border-b dark:border-neutral-800">
+    <div
+      ref={refs.containerRef}
+      className={`relative flex gap-2 border-b transition-colors ${alignClasses[align] || alignClasses.start} ${
+        theme === "dark" ? "border-neutral-800" : "border-neutral-200"
+      }`}
+    >
       {children}
       <span
-        className="absolute bottom-0 h-[2px] bg-black dark:bg-white transition-all duration-300"
+        className={`absolute bottom-0 h-[2px] transition-all duration-300 ${
+          theme === "dark" ? "bg-white" : "bg-black"
+        }`}
         style={{ left: indicator.left, width: indicator.width }}
       />
     </div>
   );
 }
 
-function Trigger({ value, className = "", children }) {
+function Trigger({ value, className = "", theme: themeProp, children }) {
   const { active, setActive, refs } = useContext(TabsContext);
+  const { theme: globalTheme } = useTheme(); // 自定义 hook 自动处理 SSR，SSR 时返回 "light"
+  const theme = themeProp || globalTheme || "light";
+
   return (
     <button
       type="button"
       onClick={() => setActive(value)}
       ref={(el) => (refs.tabRefs.current[value] = el)}
-      className={`px-3 py-2 text-sm cursor-pointer inline-flex items-center gap-1 whitespace-nowrap ${
-        active === value ? "text-black dark:text-white font-medium" : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300"
+      className={`px-3 py-2 text-sm cursor-pointer inline-flex items-center gap-1 whitespace-nowrap transition-colors focus:outline-none focus-visible:outline-none ${
+        active === value
+          ? (theme === "dark" ? "text-white font-medium" : "text-black font-medium")
+          : (theme === "dark"
+              ? "text-neutral-500 hover:text-neutral-300"
+              : "text-neutral-500 hover:text-neutral-800"
+            )
       } ${className}`}
     >
         {children}
@@ -100,3 +127,11 @@ function Pane({ value, children, keepMounted = false }) {
 const Tabs = Object.assign(Root, { List, Trigger, Pane });
 
 export default Tabs;
+
+// Named exports for convenience
+export {
+  Root as TabsRoot,
+  List as TabsList,
+  Trigger as TabsTrigger,
+  Pane as TabsPane,
+};
