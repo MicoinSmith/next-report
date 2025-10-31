@@ -13,7 +13,7 @@ import LeftPanel from "./LeftPanel";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import { zhCommands, zhExtraCommands } from "./commands";
-import { FileDown, Settings } from "lucide-react";
+import { FileDown, Settings, Loader2 } from "lucide-react";
 import modelList from "@/assets/modelList.json";
 import { Button, Menu, Dialog, DialogContent, DialogHeader, DialogTitle, MDEditor } from "@/components/ui";
 import { api } from "@/HTTP/api";
@@ -179,6 +179,7 @@ export default function Editor() {
   const [showToc, setShowToc] = useState( false );
   const [modelConfig, setModelConfig] = useState( { provider: "openai", model: "gpt-4" } );
   const [showModelConfigDialog, setShowModelConfigDialog] = useState( false );
+  const [generateLoading, setGenerateLoading] = useState( false );
   const initializedRef = useRef(false);
   const STORAGE_KEY = "editor-content";
   useEffect( () => {
@@ -221,6 +222,7 @@ export default function Editor() {
   }], [] );
 
   const handleGenerate = async (type) => {
+    setGenerateLoading(true);
     if (type === 'generatePlan') {
       // 生成大纲：需要主题（topic）和来源（source）
       // 这里暂时使用默认值，后续可以添加输入框让用户输入主题
@@ -261,6 +263,7 @@ export default function Editor() {
       // TODO: 实现一键整篇插入
       console.log('一键整篇插入功能待实现');
     }
+    setGenerateLoading(false);
   }
 
   return (
@@ -273,6 +276,10 @@ export default function Editor() {
         <div className="header h-12 flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-neutral-800">
           <h2 className="text-sm font-semibold">标题</h2>
           <div className="relative flex items-center gap-2">
+            { generateLoading && (
+              <Loader2 className="w-4 h-4 text-blue-500 dark:text-blue-400 animate-spin" />
+            )}
+
             <Menu>
               <Menu.Trigger className="rounded-md border px-2 py-1 text-xs flex items-center gap-1 cursor-pointer transition-colors border-gray-200 hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-900">
                 <Settings className="w-3 h-3" />
