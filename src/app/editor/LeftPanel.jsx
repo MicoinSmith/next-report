@@ -33,10 +33,10 @@ export default ({ onGenerate }) => {
 									<Button variant="outline" size="sm" onClick={() => onGenerate('generatePlan')}>
 										生成章节树
 									</Button>
-									<Button variant="outline" size="sm" onClick={() => onGenerate('generateMaterial')}>
+									<Button variant="outline" size="sm" disabled={true} onClick={() => onGenerate('generateMaterial')}>
 										批量生成
 									</Button>
-									<Button variant="outline" size="sm" onClick={() => onGenerate('synthesizeArticle')}>
+									<Button variant="outline" size="sm" disabled={true} onClick={() => onGenerate('synthesizeArticle')}>
 										一键整篇插入
 									</Button>
 								</div>

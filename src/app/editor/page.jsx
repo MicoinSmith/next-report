@@ -221,51 +221,45 @@ export default function Editor() {
   }], [] );
 
   const handleGenerate = async (type) => {
-    try {
-      if (type === 'generatePlan') {
-        // 生成大纲：需要主题（topic）和来源（source）
-        // 这里暂时使用默认值，后续可以添加输入框让用户输入主题
-        const topic = prompt('请输入报告主题：');
-        if (!topic) {
-          return;
-        }
-
-        // 调用生成大纲接口
-        const response = await api.generatePlan({
-          topic,
-          source: {
-            type: "web" // 默认使用网络来源，后续可以扩展为文件来源
-          }
-        });
-
-        // 检查响应是否包含 plan 数组
-        if (response && response.plan && Array.isArray(response.plan)) {
-          // 将大纲转换为 Markdown
-          const markdown = planToMarkdown(response.plan);
-
-          // 将 Markdown 插入到编辑器
-          // 如果当前有内容，在后面追加；如果没有内容，直接设置
-          if (value && value.trim()) {
-            setValue(value + "\n\n" + markdown);
-          } else {
-            setValue(markdown);
-          }
-        } else if (response?.error) {
-          // 显示错误信息
-          alert(`生成大纲失败：${response.error}`);
-        } else {
-          alert('生成大纲失败：返回数据格式不正确');
-        }
-      } else if (type === 'generateMaterial') {
-        // TODO: 实现批量生成素材
-        console.log('批量生成素材功能待实现');
-      } else if (type === 'synthesizeArticle') {
-        // TODO: 实现一键整篇插入
-        console.log('一键整篇插入功能待实现');
+    if (type === 'generatePlan') {
+      // 生成大纲：需要主题（topic）和来源（source）
+      // 这里暂时使用默认值，后续可以添加输入框让用户输入主题
+      const topic = prompt('请输入报告主题：');
+      if (!topic) {
+        return;
       }
-    } catch (error) {
-      console.error('生成失败：', error);
-      alert(`生成失败：${error.message || '未知错误'}`);
+
+      // 调用生成大纲接口
+      const response = await api.generatePlan({
+        topic,
+        source: {
+          type: "web" // 默认使用网络来源，后续可以扩展为文件来源
+        }
+      });
+
+      // 检查响应是否包含 plan 数组
+      if (response && response.plan && Array.isArray(response.plan)) {
+        // 将大纲转换为 Markdown
+        const markdown = planToMarkdown(response.plan);
+
+        // 将 Markdown 插入到编辑器
+        // 如果当前有内容，在后面追加；如果没有内容，直接设置
+        if (value && value.trim()) {
+          setValue(markdown);
+          Message.success('内容已更新!');
+        }
+      } else if (response?.error) {
+        // 显示错误信息
+        alert(`生成大纲失败：${response.error}`);
+      } else {
+        alert('生成大纲失败：返回数据格式不正确');
+      }
+    } else if (type === 'generateMaterial') {
+      // TODO: 实现批量生成素材
+      console.log('批量生成素材功能待实现');
+    } else if (type === 'synthesizeArticle') {
+      // TODO: 实现一键整篇插入
+      console.log('一键整篇插入功能待实现');
     }
   }
 
