@@ -16,13 +16,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'yarn'
+          node-version: 24.10.0
 
-      - name: Set Yarn version
-        run: |
-          corepack enable
-          yarn set version 4.10.3
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install deps
         run: |
@@ -52,13 +49,8 @@ jobs:
             git pull --rebase origin "$GIT_BRANCH"
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            # 使用 yarn set version 直接设置 Yarn 版本
-            yarn set version 4.10.3
-            # 验证 Yarn 版本
-            yarn --version
-            # 安装依赖
+            corepack enable
             yarn install --immutable || yarn install
-            # 构建
             NODE_ENV=production yarn build
             if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
               pm2 restart "$APP_NAME"
