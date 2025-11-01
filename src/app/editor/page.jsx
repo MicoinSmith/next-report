@@ -267,7 +267,7 @@ export default function Editor() {
   }
 
   return (
-    <div className="flex min-h-svh w-full h-full">
+    <div className="flex w-full h-[calc(100vh-48px)]">
       {/* 左侧：Topic / 数据源 / 生成大纲 */ }
       <LeftPanel onGenerate={handleGenerate} />
 
