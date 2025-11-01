@@ -19,6 +19,7 @@ export default function httpCreator( { baseURL = '/api', timeout = 1000 * 60 * 1
     HTTP.interceptors.request.use(
         config => {
             config.headers['Authorization'] = null;
+            config.headers ['cache-control'] = 'no-cache';
             return config;
         },
         error => {
@@ -101,7 +102,7 @@ export default function httpCreator( { baseURL = '/api', timeout = 1000 * 60 * 1
             const res = await fetch( TargetUrl, {
                 method: 'POST',
                 headers: {
-                    ...headers,
+                    ...defaultHeaders,
                 },
                 body: body ? JSON.stringify( body ) : undefined,
             } );

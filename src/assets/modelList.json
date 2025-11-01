@@ -10,12 +10,5 @@
 			"description": "GPT-4 Turbo is a large language model developed by OpenAI. It is a powerful model that can be used for a variety of tasks.",
 			"url": "https://api.openai.com/v1/models/gpt-4-turbo"
 		}
-	],
-	"anthropic": [
-		{
-			"name": "Claude 3.5 Sonnet",
-			"description": "Claude 3.5 Sonnet is a large language model developed by Anthropic. It is a powerful model that can be used for a variety of tasks.",
-			"url": "https://api.anthropic.com/v1/models/claude-3-5-sonnet"
-		}
 	]
 }

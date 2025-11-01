@@ -4,7 +4,7 @@ import { useTheme } from "@/hooks/useTheme";
 import FilesTree from "./FilesTree";
 import { Button, Tabs, Input } from "@/components/ui";
 
-export default ({ onGenerate }) => {
+export default ({ onGenerate, updateFilesList }) => {
 	const { theme, setTheme, mounted } = useTheme(); // 现在可以访问主题，用于将来扩展功能
 	const [activeTab, setActiveTab] = useState( "文件列表" );
 
@@ -25,7 +25,7 @@ export default ({ onGenerate }) => {
 					</Tabs.List>
 					<div className="mt-4">
 						<Tabs.Pane value="文件列表">
-							<FilesTree />
+							<FilesTree updateFilesList={ updateFilesList } />
 						</Tabs.Pane>
 						<Tabs.Pane value="编辑">
 							<div className="dark:border-neutral-800 pt-2">

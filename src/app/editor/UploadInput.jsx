@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Upload } from "lucide-react";
 import { api } from "@/HTTP/api";
 import { Button } from "@/components/ui";
+import { Message } from "@/components/ui/Message";
 
-export default () => {
+export default ({ onUploaded }) => {
 	const [hover, setHover] = useState( false );
 	const [files, setFiles] = useState( [] );
 
@@ -21,8 +22,8 @@ export default () => {
 		const fileList = Array.from( e.target.files || [] );
 		const res = await api.uploadFiles( fileList );
 		if( res.status == 'success' ) {
-			// setFiles( res.data );
-			console.log( res );
+			Message.success( '文件上传成功!' );
+			onUploaded( res.uploaded_files );
 		}
 	};
 

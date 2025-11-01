@@ -15,7 +15,7 @@ import "@uiw/react-markdown-preview/markdown.css";
 import { zhCommands, zhExtraCommands } from "./commands";
 import { FileDown, Settings, Loader2 } from "lucide-react";
 import modelList from "@/assets/modelList.json";
-import { Button, Menu, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, MDEditor, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Input } from "@/components/ui";
+import { Button, Menu, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, MDEditor, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Input, Checkbox } from "@/components/ui";
 import { api } from "@/HTTP/api";
 
 // 导出工具函数（供头部按钮与弹层复用）
@@ -181,6 +181,13 @@ export default function Editor() {
   const [showModelConfigDialog, setShowModelConfigDialog] = useState( false );
   const [modelConfigForm, setModelConfigForm] = useState( { model: null, key: null } );
 
+  const [filesList, setFilesList] = useState( [] );
+
+  const [showGeneratePlanDialog, setShowGeneratePlanDialog] = useState( false );
+  const [generatePlanTitle, setGeneratePlanTitle] = useState( null );
+  const [generatePlanSource, setGeneratePlanSource] = useState( null );
+  const [generatePlanSourceFilesPaths, setGeneratePlanSourceFilesPaths] = useState( [] );
+
   // 内容生成
   const [generateLoading, setGenerateLoading] = useState( false );
   const initializedRef = useRef( false );
@@ -235,41 +242,60 @@ export default function Editor() {
     // }
   }
 
-  const handleGenerate = async ( type ) => {
+  const handleGenerate = async ( type, isCallback = false ) => {
     if ( type === 'generatePlan' ) {
-      // 生成大纲：需要主题（topic）和来源（source）
-      // 这里暂时使用默认值，后续可以添加输入框让用户输入主题
-      const topic = prompt( '请输入报告主题：' );
-      if ( !topic ) {
-        return;
+      if(!isCallback || !generatePlanTitle || !generatePlanSource || (generatePlanSource === 'file' && !generatePlanSourceFilesPaths) ) {
+        const showMessage = () => {
+          Message.info( '请填写或完整信息' );
+          setShowGeneratePlanDialog( true );
+        }
+        if(isCallback) {
+          setTimeout(() => {
+            showMessage();
+          }, 500);
+        } else {
+          showMessage();
+        }
+        return
       }
 
       setGenerateLoading( true );
 
-      // 调用生成大纲接口
-      const response = await api.generatePlan( {
-        topic,
+      let params = {
+        topic: generatePlanTitle,
         source: {
-          type: "web" // 默认使用网络来源，后续可以扩展为文件来源
+          type: generatePlanSource,
         }
-      } );
+      }
+      if(params.source.type === 'files') {
+        params = {
+          ...params,
+          source: {
+            ...params.source,
+            paths: generatePlanSourceFilesPaths
+          }
+        }
+      }
+
+      // 调用生成大纲接口
+      const res = await api.generatePlan( params );
 
       // 检查响应是否包含 plan 数组
-      if ( response && response.plan && Array.isArray( response.plan ) ) {
+      if ( res && res.plan && Array.isArray( res.plan ) ) {
         // 将大纲转换为 Markdown
-        const markdown = planToMarkdown( response.plan );
+        const markdown = planToMarkdown( res.plan );
 
         // 将 Markdown 插入到编辑器
         // 如果当前有内容，在后面追加；如果没有内容，直接设置
         if ( value && value.trim() ) {
           setValue( markdown );
           Message.success( '内容已更新!' );
+          setGeneratePlanTitle( null );
+          setGeneratePlanSource( null );
+          setGeneratePlanSourceFilesPaths( [] );
         }
-      } else if ( response?.error ) {
-        // 显示错误信息
-        alert( `生成大纲失败：${ response.error }` );
       } else {
-        alert( '生成大纲失败：返回数据格式不正确' );
+        Message.error( res?.message || res?.error || "生成失败!" );
       }
     } else if ( type === 'generateMaterial' ) {
       // TODO: 实现批量生成素材
@@ -281,10 +307,18 @@ export default function Editor() {
     setGenerateLoading( false );
   }
 
+  const updateFilesList = ( files ) => {
+    setFilesList( files );
+  }
+
+  const handleSelectFile = ( filepath ) => {
+    setGeneratePlanSourceFilesPaths( prev => prev.includes( filepath ) ? prev.filter( path => path !== filepath ) : [...prev, filepath] );
+  }
+
   return (
     <div className="flex w-full h-[calc(100vh-48px)]">
       {/* 左侧：Topic / 数据源 / 生成大纲 */ }
-      <LeftPanel onGenerate={ handleGenerate } />
+      <LeftPanel onGenerate={ handleGenerate } updateFilesList={ updateFilesList } />
 
       {/* 内容区 */ }
       <div className="h-full flex flex-1 flex-col">
@@ -429,6 +463,60 @@ export default function Editor() {
           <DialogFooter>
             <Button variant="outline" size="default" onClick={ () => setShowModelConfigDialog( false ) }>关闭</Button>
             <Button variant="outline" size="default" onClick={ () => handleSaveModelConfig() }>保存</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={ showGeneratePlanDialog } onOpenChange={ setShowGeneratePlanDialog }>
+        <DialogContent className="max-w-3xl md:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>生成大纲</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold text-nowrap">填写标题:</div>
+              <Input type="text" placeholder="请输入标题" value={ generatePlanTitle } onChange={ ( e ) => setGeneratePlanTitle( e.target.value ) } />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold text-nowrap">选择来源:</div>
+              <Select value={ generatePlanSource } onValueChange={ ( value ) => setGeneratePlanSource( value ) }>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择来源" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="web">网络</SelectItem>
+                  <SelectItem value="files">文件</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            { generatePlanSource == 'files' && (
+              <div className="flex items-start gap-2">
+                <div className="text-sm font-semibold text-nowrap">选择文件:</div>
+                <div className="flex flex-col gap-2">
+                  {
+                    filesList.map( ( file ) => (
+                      <div key={ file.id } className="flex items-center gap-2 min-w-0">
+                        <Checkbox checked={ generatePlanSourceFilesPaths?.includes( file.filepath ) } id={ file.id } />
+                        <label htmlFor={ file.id } className="w-120 min-w-0 max-w-120 inline-block text-sm font-semibold truncate flex-1 overflow-hidden text-ellipsis whitespace-nowrap" onClick={ () => handleSelectFile( file.filepath ) }>{ file.filename }</label>
+                      </div>
+                    ) )
+                  }
+                </div>
+              </div>
+            ) }
+          </div>
+          <DialogFooter>
+            <Button variant="outline" size="default" onClick={ () => setShowGeneratePlanDialog( false ) }>关闭</Button>
+            <Button variant="outline" size="default"
+              onClick={ () => {
+                setShowGeneratePlanDialog( false );
+                setTimeout(() => {
+                  handleGenerate('generatePlan', true);
+                }, 500);
+              } }
+            >
+                生成
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

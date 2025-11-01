@@ -2,9 +2,11 @@
 
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { X, CheckCircle2, AlertCircle, Info, AlertTriangle } from "lucide-react";
+import Dialog, { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./Dialog";
+import Button from "./Button";
+import { useTheme } from "@/hooks/useTheme";
 
 const MessageContext = createContext(null);
-
 let messageId = 0;
 
 // 全局 Message 对象，用于直接调用
@@ -19,6 +21,9 @@ const globalMessage = {
     console.warn("Message API 尚未初始化，请确保已使用 MessageProvider 包裹应用");
   },
   info: () => {
+    console.warn("Message API 尚未初始化，请确保已使用 MessageProvider 包裹应用");
+  },
+  confirm: () => {
     console.warn("Message API 尚未初始化，请确保已使用 MessageProvider 包裹应用");
   },
   showMessage: () => {
@@ -111,8 +116,104 @@ function MessageContainer({ messages, onClose }) {
   );
 }
 
+function ConfirmDialog({ open, onOpenChange, content, title = "确认", type = "warning", position = "top", onOk, onCancel }) {
+  const Icon = icons[type] || icons.warning;
+  const typeStyles = {
+    success: "text-green-600 dark:text-green-400",
+    error: "text-red-600 dark:text-red-400",
+    warning: "text-yellow-600 dark:text-yellow-400",
+    info: "text-blue-600 dark:text-blue-400",
+    danger: "text-red-600 dark:text-red-400",
+  };
+
+  const positionClasses = {
+    top: "!top-[12%] !-translate-y-1/4",
+    center: "!top-1/2 !-translate-y-1/2",
+    bottom: "!top-[75%] !-translate-y-3/4",
+  };
+
+  const getBorderColor = (type) => {
+    const borderColors = {
+      success: { color: "rgb(34 197 94)", rgba: "rgba(34, 197, 94, " },
+      error: { color: "rgb(239 68 68)", rgba: "rgba(239, 68, 68, " },
+      warning: { color: "rgb(234 179 8)", rgba: "rgba(234, 179, 8, " },
+      info: { color: "rgb(59 130 246)", rgba: "rgba(59, 130, 246, " },
+      danger: { color: "rgb(239 68 68)", rgba: "rgba(239, 68, 68, " },
+    };
+    const colors = borderColors[type] || borderColors.warning;
+    return { colors, className: "border-2" };
+  };
+
+  const handleOk = async () => {
+    if (onOk) {
+      await onOk();
+    }
+    onOpenChange(false);
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    }
+    onOpenChange(false);
+  };
+
+  const borderStyle = getBorderColor(type);
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes breathing-border {
+            0%, 100% {
+              border-color: ${borderStyle.colors.rgba}1);
+            }
+            50% {
+              border-color: ${borderStyle.colors.rgba}0.4);
+            }
+          }
+          .animate-breathing-border-${type} {
+            animation: breathing-border 2s ease-in-out infinite;
+          }
+        `
+      }} />
+      <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className={`max-w-md ${positionClasses[position] || positionClasses.top} ${borderStyle.className} animate-breathing-border-${type}`}
+        style={{ borderColor: borderStyle.colors.color }}
+      >
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <Icon className={`h-5 w-5 shrink-0 ${typeStyles[type]}`} />
+            <DialogTitle>{title}</DialogTitle>
+          </div>
+          {content && <DialogDescription className="mt-2">{content}</DialogDescription>}
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel} size="sm">
+            取消
+          </Button>
+          <Button variant="outline" onClick={handleOk} size="sm" className={`${typeStyles[type]}`}>
+            确定
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
+  );
+}
+
 export function MessageProvider({ children }) {
   const [messages, setMessages] = useState([]);
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    content: "",
+    title: "确认",
+    type: "warning",
+    position: "top",
+    onOk: null,
+    onCancel: null,
+  });
 
   const showMessage = useCallback((content, type = "info", options = {}) => {
     const id = ++messageId;
@@ -153,12 +254,25 @@ export function MessageProvider({ children }) {
     [showMessage]
   );
 
+  const confirm = useCallback((content, title = "确认", options = {}) => {
+    setConfirmState({
+      open: true,
+      content,
+      title,
+      type: options.type || "warning",
+      position: options.position || "top",
+      onOk: options.onOk || null,
+      onCancel: options.onCancel || null,
+    });
+  }, []);
+
   const value = {
     showMessage,
     success,
     error,
     warning,
     info,
+    confirm,
     removeMessage,
   };
 
@@ -167,6 +281,7 @@ export function MessageProvider({ children }) {
   globalMessage.error = error;
   globalMessage.warning = warning;
   globalMessage.info = info;
+  globalMessage.confirm = confirm;
   globalMessage.showMessage = showMessage;
   globalMessage.removeMessage = removeMessage;
 
@@ -179,6 +294,16 @@ export function MessageProvider({ children }) {
     <MessageContext.Provider value={value}>
       {children}
       <MessageContainer messages={messages} onClose={removeMessage} />
+      <ConfirmDialog
+        open={confirmState.open}
+        onOpenChange={(open) => setConfirmState((prev) => ({ ...prev, open }))}
+        content={confirmState.content}
+        title={confirmState.title}
+        type={confirmState.type}
+        position={confirmState.position}
+        onOk={confirmState.onOk}
+        onCancel={confirmState.onCancel}
+      />
     </MessageContext.Provider>
   );
 }
