@@ -1,6 +1,6 @@
 import httpCreator from './'
 
-const { HTTP, POST, uploadMultiple } = httpCreator( {} )
+const { HTTP, POST, upload, uploadMultiple } = httpCreator( {} )
 
 // API 接口
 export const api = {
@@ -10,16 +10,13 @@ export const api = {
 	// 2. 配置 LLM（大语言模型）
 	config: ( data ) => POST( '/config', data ),
 
-	// 3. 上传文件
-	uploadFiles: ( files, onProgress ) => {
-		if ( !files || ( Array.isArray( files ) && files.length === 0 ) ) {
-			return Promise.reject( new Error( 'No files provided' ) )
-		}
-		const filesArray = Array.isArray( files ) ? files : [ files ]
-		return uploadMultiple( '/upload-files', filesArray, onProgress )
-	},
+	// 3. 上传单文件
+	uploadFile: ( file, onProgress ) => upload( '/upload-files', file, onProgress ),
 
-	// 4. 生成写作大纲（Plan）
+	// 4. 上传文件
+	uploadFiles: ( files, onProgress ) => uploadMultiple( '/upload-files', files, onProgress ),
+
+	// 5. 生成写作大纲（Plan）
 	generatePlan: ( data ) => POST( '/generate-plan', data ),
 
 	// 5. 生成大纲步骤素材（Material）

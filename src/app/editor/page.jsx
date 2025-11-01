@@ -15,11 +15,11 @@ import "@uiw/react-markdown-preview/markdown.css";
 import { zhCommands, zhExtraCommands } from "./commands";
 import { FileDown, Settings, Loader2 } from "lucide-react";
 import modelList from "@/assets/modelList.json";
-import { Button, Menu, Dialog, DialogContent, DialogHeader, DialogTitle, MDEditor } from "@/components/ui";
+import { Button, Menu, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, MDEditor, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Input } from "@/components/ui";
 import { api } from "@/HTTP/api";
 
 // 导出工具函数（供头部按钮与弹层复用）
-const exportMarkdownToMD = (markdown) => {
+const exportMarkdownToMD = ( markdown ) => {
   const blob = new Blob( [markdown], { type: "text/markdown;charset=utf-8" } );
   const url = URL.createObjectURL( blob );
   const a = document.createElement( "a" );
@@ -29,7 +29,7 @@ const exportMarkdownToMD = (markdown) => {
   URL.revokeObjectURL( url );
 };
 
-const exportMarkdownToHTML = (markdown) => {
+const exportMarkdownToHTML = ( markdown ) => {
   const tpl = `<!doctype html>
 <html>
   <head>
@@ -64,18 +64,18 @@ const exportMarkdownToHTML = (markdown) => {
     </script>
   </body>
 </html>`;
-  const b64 = btoa(unescape(encodeURIComponent(markdown)));
-  const html = tpl.replace('__B64__', b64);
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const b64 = btoa( unescape( encodeURIComponent( markdown ) ) );
+  const html = tpl.replace( '__B64__', b64 );
+  const blob = new Blob( [html], { type: 'text/html;charset=utf-8' } );
+  const url = URL.createObjectURL( blob );
+  const a = document.createElement( 'a' );
   a.href = url;
   a.download = 'report.html';
   a.click();
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL( url );
 };
 
-const exportMarkdownToPDF = (markdown) => {
+const exportMarkdownToPDF = ( markdown ) => {
   const tpl = `<!doctype html>
 <html>
   <head>
@@ -111,12 +111,12 @@ const exportMarkdownToPDF = (markdown) => {
     </script>
   </body>
 </html>`;
-  const b64 = btoa(unescape(encodeURIComponent(markdown)));
-  const html = tpl.replace('__B64__', b64);
-  const win = window.open('', '_blank');
-  if (win) {
+  const b64 = btoa( unescape( encodeURIComponent( markdown ) ) );
+  const html = tpl.replace( '__B64__', b64 );
+  const win = window.open( '', '_blank' );
+  if ( win ) {
     win.document.open();
-    win.document.write(html);
+    win.document.write( html );
     win.document.close();
   }
 }
@@ -152,22 +152,22 @@ const slugify = ( s ) => {
 }
 
 // 将大纲数据转换为 Markdown 格式
-const planToMarkdown = (plan) => {
-  if (!plan || !Array.isArray(plan) || plan.length === 0) {
+const planToMarkdown = ( plan ) => {
+  if ( !plan || !Array.isArray( plan ) || plan.length === 0 ) {
     return "";
   }
 
   let markdown = "# 大纲\n\n";
 
-  plan.forEach((item) => {
+  plan.forEach( ( item ) => {
     const { step, title, description } = item;
     // 使用二级标题，格式：## 1. Title
-    markdown += `## ${step}. ${title}\n\n`;
+    markdown += `## ${ step }. ${ title }\n\n`;
     // 描述作为段落
-    if (description) {
-      markdown += `${description}\n\n`;
+    if ( description ) {
+      markdown += `${ description }\n\n`;
     }
-  });
+  } );
 
   return markdown.trim();
 }
@@ -179,13 +179,16 @@ export default function Editor() {
   const [showToc, setShowToc] = useState( false );
   const [modelConfig, setModelConfig] = useState( { provider: "openai", model: "gpt-4" } );
   const [showModelConfigDialog, setShowModelConfigDialog] = useState( false );
+  const [modelConfigForm, setModelConfigForm] = useState( { model: null, key: null } );
+
+  // 内容生成
   const [generateLoading, setGenerateLoading] = useState( false );
-  const initializedRef = useRef(false);
+  const initializedRef = useRef( false );
   const STORAGE_KEY = "editor-content";
   useEffect( () => {
-    const cached = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-    if (cached && !initializedRef.current) {
-      setValue(cached);
+    const cached = typeof window !== "undefined" ? localStorage.getItem( STORAGE_KEY ) : null;
+    if ( cached && !initializedRef.current ) {
+      setValue( cached );
       initializedRef.current = true;
       return;
     }
@@ -198,19 +201,19 @@ export default function Editor() {
           setValue( text || "" );
           initializedRef.current = true;
         }
-      } catch {}
+      } catch { }
     } )();
     return () => {
       cancelled = true;
     };
   }, [] );
-  useEffect(() => {
+  useEffect( () => {
     try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem(STORAGE_KEY, value || "");
+      if ( typeof window !== "undefined" ) {
+        localStorage.setItem( STORAGE_KEY, value || "" );
       }
-    } catch {}
-  }, [value]);
+    } catch { }
+  }, [value] );
 
   const toc = useMemo( () => extractHeadings( value ), [value] );
   const tocCommand = useMemo( () => [{
@@ -221,55 +224,67 @@ export default function Editor() {
     execute: () => setShowToc( ( v ) => !v ),
   }], [] );
 
-  const handleGenerate = async (type) => {
-    setGenerateLoading(true);
-    if (type === 'generatePlan') {
+  const handleSaveModelConfig = async ( apiKey ) => {
+    console.log( '保存模型配置', modelConfigForm );
+    Message.warning( '保存模型配置功能待实现' );
+    // const response = await api.saveModelConfig(modelConfigForm);
+    // if (response.status === 'success') {
+    //   Message.success('模型配置保存成功!');
+    // } else {
+    //   Message.error('模型配置保存失败!');
+    // }
+  }
+
+  const handleGenerate = async ( type ) => {
+    if ( type === 'generatePlan' ) {
       // 生成大纲：需要主题（topic）和来源（source）
       // 这里暂时使用默认值，后续可以添加输入框让用户输入主题
-      const topic = prompt('请输入报告主题：');
-      if (!topic) {
+      const topic = prompt( '请输入报告主题：' );
+      if ( !topic ) {
         return;
       }
 
+      setGenerateLoading( true );
+
       // 调用生成大纲接口
-      const response = await api.generatePlan({
+      const response = await api.generatePlan( {
         topic,
         source: {
           type: "web" // 默认使用网络来源，后续可以扩展为文件来源
         }
-      });
+      } );
 
       // 检查响应是否包含 plan 数组
-      if (response && response.plan && Array.isArray(response.plan)) {
+      if ( response && response.plan && Array.isArray( response.plan ) ) {
         // 将大纲转换为 Markdown
-        const markdown = planToMarkdown(response.plan);
+        const markdown = planToMarkdown( response.plan );
 
         // 将 Markdown 插入到编辑器
         // 如果当前有内容，在后面追加；如果没有内容，直接设置
-        if (value && value.trim()) {
-          setValue(markdown);
-          Message.success('内容已更新!');
+        if ( value && value.trim() ) {
+          setValue( markdown );
+          Message.success( '内容已更新!' );
         }
-      } else if (response?.error) {
+      } else if ( response?.error ) {
         // 显示错误信息
-        alert(`生成大纲失败：${response.error}`);
+        alert( `生成大纲失败：${ response.error }` );
       } else {
-        alert('生成大纲失败：返回数据格式不正确');
+        alert( '生成大纲失败：返回数据格式不正确' );
       }
-    } else if (type === 'generateMaterial') {
+    } else if ( type === 'generateMaterial' ) {
       // TODO: 实现批量生成素材
-      console.log('批量生成素材功能待实现');
-    } else if (type === 'synthesizeArticle') {
+      console.log( '批量生成素材功能待实现' );
+    } else if ( type === 'synthesizeArticle' ) {
       // TODO: 实现一键整篇插入
-      console.log('一键整篇插入功能待实现');
+      console.log( '一键整篇插入功能待实现' );
     }
-    setGenerateLoading(false);
+    setGenerateLoading( false );
   }
 
   return (
     <div className="flex w-full h-[calc(100vh-48px)]">
       {/* 左侧：Topic / 数据源 / 生成大纲 */ }
-      <LeftPanel onGenerate={handleGenerate} />
+      <LeftPanel onGenerate={ handleGenerate } />
 
       {/* 内容区 */ }
       <div className="h-full flex flex-1 flex-col">
@@ -278,62 +293,62 @@ export default function Editor() {
           <div className="relative flex items-center gap-2">
             { generateLoading && (
               <Loader2 className="w-4 h-4 text-blue-500 dark:text-blue-400 animate-spin" />
-            )}
+            ) }
 
             <Menu>
-              <Menu.Trigger className="rounded-md border px-2 py-1 text-xs flex items-center gap-1 cursor-pointer transition-colors border-gray-200 hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-900">
+              <Menu.Trigger className={ `rounded-md border px-2 py-1 text-xs flex items-center gap-1 cursor-pointer transition-colors ${ theme === "dark" ? "border-neutral-600 hover:bg-neutral-900" : "border-gray-200 hover:bg-neutral-100" }` }>
                 <Settings className="w-3 h-3" />
-                <span className="ml-1">{modelConfig.model || "选择模型"}</span>
+                <span className="ml-1">{ modelConfig.model || "选择模型" }</span>
               </Menu.Trigger>
               <Menu.Content>
-                {Object.entries(modelList).map(([provider, models], providerIndex) => {
+                { Object.entries( modelList ).map( ( [provider, models], providerIndex ) => {
                   // 支持数组和对象两种格式
-                  const modelArray = Array.isArray(models)
+                  const modelArray = Array.isArray( models )
                     ? models
-                    : Object.values(models);
+                    : Object.values( models );
 
                   return (
-                    <div key={provider}>
+                    <div key={ provider }>
                       <Menu.Label className="uppercase">
-                        {provider}
+                        { provider }
                       </Menu.Label>
-                      {modelArray.map((model, modelIndex) => (
+                      { modelArray.map( ( model, modelIndex ) => (
                         <Menu.Item
-                          key={`${provider}-${modelIndex}`}
-                          onSelect={() => {
-                            setModelConfig({ provider, model: model.name });
-                          }}
+                          key={ `${ provider }-${ modelIndex }` }
+                          onSelect={ () => {
+                            setModelConfig( { provider, model: model.name } );
+                          } }
                         >
-                          {model.name}
+                          { model.name }
                         </Menu.Item>
-                      ))}
-                      {providerIndex < Object.keys(modelList).length - 1 && (
+                      ) ) }
+                      { providerIndex < Object.keys( modelList ).length - 1 && (
                         <Menu.Separator />
-                      )}
+                      ) }
                     </div>
                   );
-                })}
+                } ) }
                 <Menu.Separator />
-                <Menu.Item onSelect={() => setShowModelConfigDialog(true)}>配置 API Key</Menu.Item>
+                <Menu.Item onSelect={ () => setShowModelConfigDialog( true ) }>配置 API Key</Menu.Item>
               </Menu.Content>
             </Menu>
 
             <Menu>
-              <Menu.Trigger className="rounded-md border px-2 py-1 text-xs flex items-center gap-1 cursor-pointer transition-colors border-gray-200 hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-900">
+              <Menu.Trigger className={ `rounded-md border px-2 py-1 text-xs flex items-center gap-1 cursor-pointer transition-colors ${ theme === "dark" ? "border-neutral-600 hover:bg-neutral-900" : "border-gray-200 hover:bg-neutral-100" }` }>
                 <FileDown className="w-3 h-3" />
                 <span className="ml-1">导出</span>
               </Menu.Trigger>
               <Menu.Content>
-                <Menu.Item onClick={() => exportMarkdownToMD(value)}>导出 MD</Menu.Item>
-                <Menu.Item onClick={() => exportMarkdownToHTML(value)}>导出 HTML</Menu.Item>
-                <Menu.Item onClick={() => exportMarkdownToPDF(value)}>导出 PDF</Menu.Item>
+                <Menu.Item onClick={ () => exportMarkdownToMD( value ) }>导出 MD</Menu.Item>
+                <Menu.Item onClick={ () => exportMarkdownToHTML( value ) }>导出 HTML</Menu.Item>
+                <Menu.Item onClick={ () => exportMarkdownToPDF( value ) }>导出 PDF</Menu.Item>
               </Menu.Content>
             </Menu>
           </div>
         </div>
-        <div className="flex-1 flex overflow-hidden" style={{ height: 'calc(100vh - 48px - 48px - 40px)' }}>
-          <section className="h-full flex-1 border-r border-gray-200 dark:border-neutral-800 overflow-hidden" style={{ height: '100%' }}>
-            <div className="h-full" style={{ height: '100%' }}>
+        <div className="flex-1 flex overflow-hidden" style={ { height: 'calc(100vh - 48px - 48px - 40px)' } }>
+          <section className={ `h-full flex-1 border-r ${ theme === "dark" ? "border-neutral-600" : "border-gray-200" } overflow-hidden` } style={ { height: '100%' } }>
+            <div className="h-full" style={ { height: '100%' } }>
               <MDEditor
                 value={ value }
                 preview="live"
@@ -355,7 +370,7 @@ export default function Editor() {
             </div>
           </section>
           { showToc && (
-            <div className="h-full pointer-events-auto top-22 z-50 w-36 overflow-auto border-y border-gray-200 dark:border-neutral-800 bg-background p-3 shadow-lg">
+            <div className={ `h-full pointer-events-auto top-22 z-50 w-36 overflow-auto border-y ${ theme === "dark" ? "border-neutral-600" : "border-gray-200" } bg-background p-3 shadow-lg` }>
               <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-sm font-semibold">目录</h3>
                 <Button variant="outline" size="sm" onClick={ () => setShowToc( false ) }>关闭</Button>
@@ -376,20 +391,45 @@ export default function Editor() {
             </div>
           ) }
         </div>
-        <div className="h-10 px-4 py-2 flex items-center justify-between text-sm text-neutral-500 border-t border-gray-200 dark:border-neutral-800">
+        <div className={ `h-10 px-4 py-2 flex items-center justify-between text-sm border-t ${ theme === "dark" ? "border-neutral-600 text-neutral-400" : "border-gray-200 text-neutral-500" }` }>
           <p>* 每隔30秒自动保存一次</p>
           <p>{ value.split( "\n" ).length } 行, 共 { value.length } 字</p>
         </div>
       </div>
 
       <Dialog
-        open={showModelConfigDialog}
-        onOpenChange={setShowModelConfigDialog}
+        open={ showModelConfigDialog }
+        onOpenChange={ setShowModelConfigDialog }
       >
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="pb-2 border-b border-gray-200 dark:border-neutral-600">
             <DialogTitle>配置 API Key</DialogTitle>
           </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold text-nowrap">选择模型:</div>
+              <Select value={ modelConfigForm.model } onValueChange={ ( value ) => setModelConfigForm( { ...modelConfigForm, model: value } ) }>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择模型" />
+                </SelectTrigger>
+                <SelectContent>
+                  { Object.entries( modelList ).map( ( [provider, models], providerIndex ) => {
+                    return models.map( ( model ) => (
+                      <SelectItem key={ model.name } value={ model.name }>{ model.name }</SelectItem>
+                    ) );
+                  } ) }
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold text-nowrap">选择 API Key:</div>
+              <Input type="text" placeholder="请输入 API Key" value={ modelConfigForm.key } onChange={ ( e ) => setModelConfigForm( { ...modelConfigForm, key: e.target.value } ) } />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" size="default" onClick={ () => setShowModelConfigDialog( false ) }>关闭</Button>
+            <Button variant="outline" size="default" onClick={ () => handleSaveModelConfig() }>保存</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -14,7 +14,12 @@ export default () => {
 		setHover( false );
 	};
 	const onChange = async ( e ) => {
-		const res = await api.uploadFiles( e.target.files );
+		console.log( "onChange" );
+		// curl -X POST http://localhost:5000/upload-files \
+		// 	-F "files=@/path/to/document1.pdf" \
+		// 	-F "files=@/path/to/document2.txt"
+		const fileList = Array.from( e.target.files || [] );
+		const res = await api.uploadFiles( fileList );
 		if( res.status == 'success' ) {
 			// setFiles( res.data );
 			console.log( res );

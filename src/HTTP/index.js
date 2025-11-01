@@ -192,11 +192,16 @@ export default function httpCreator( { baseURL = '/api', timeout = 1000 * 60 * 1
     } );
 
     // 多文件上传方法（支持进度条）
-    const uploadMultiple = ( HTTP.uploadMultiple = ( url, files, onProgress, config = {} ) => {
-        const formData = new FormData();
-        files.forEach( ( file, index ) => {
-            formData.append( `files[${ index }]`, file );
-        } );
+	const uploadMultiple = ( HTTP.uploadMultiple = ( url, files, onProgress, config = {} ) => {
+		const formData = new FormData();
+        console.log( "files", files );
+
+		// 确保 files 是数组
+		const fileList = Array.isArray( files ) ? files : [];
+
+		fileList.forEach( ( file ) => {
+			formData.append( 'files', file );
+		} );
 
         return HTTP.request( {
             ...config,

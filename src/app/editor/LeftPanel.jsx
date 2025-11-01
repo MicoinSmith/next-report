@@ -9,7 +9,7 @@ export default ({ onGenerate }) => {
 	const [activeTab, setActiveTab] = useState( "文件列表" );
 
 	return (
-		<div className="w-[280px] shrink-0 h-full border-r border-gray-200 dark:border-neutral-800 flex flex-col">
+		<div className={`w-[280px] shrink-0 h-full border-r ${theme === "dark" ? "border-neutral-600" : "border-gray-200"} flex flex-col`}>
 			<div className="flex-1 overflow-y-auto px-4 py-2">
 				<Tabs defaultValue="文件列表" onValueChange={ setActiveTab } indicatorBasis="trigger">
 					<Tabs.List align="center">
@@ -30,13 +30,13 @@ export default ({ onGenerate }) => {
 						<Tabs.Pane value="编辑">
 							<div className="dark:border-neutral-800 pt-2">
 								<div className="space-y-3 flex flex-col gap-1">
-									<Button variant="outline" size="sm" onClick={() => onGenerate('generatePlan')}>
+									<Button variant="outline" size="default" onClick={() => onGenerate('generatePlan')}>
 										生成章节树
 									</Button>
-									<Button variant="outline" size="sm" disabled={true} onClick={() => onGenerate('generateMaterial')}>
+									<Button variant="outline" size="default" disabled={true} onClick={() => onGenerate('generateMaterial')}>
 										批量生成
 									</Button>
-									<Button variant="outline" size="sm" disabled={true} onClick={() => onGenerate('synthesizeArticle')}>
+									<Button variant="outline" size="default" disabled={true} onClick={() => onGenerate('synthesizeArticle')}>
 										一键整篇插入
 									</Button>
 								</div>

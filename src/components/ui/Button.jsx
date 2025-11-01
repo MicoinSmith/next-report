@@ -20,9 +20,10 @@ const Button = forwardRef(
     const baseClasses = "inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50 cursor-pointer";
 
     const sizeClasses = {
+      xs: "h-6 px-1.5 text-[11px]",
+      sm: "h-7 px-2 text-xs",
       default: "h-8 px-3 py-1.5",
-      sm: "h-7 px-2 text-[10px]",
-      lg: "h-9 px-4",
+      lg: "h-9 px-4 text-sm",
       icon: "h-8 w-8",
     };
 

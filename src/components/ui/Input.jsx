@@ -19,7 +19,7 @@ const Input = forwardRef(
 
     const baseClasses = variant === "ghost"
       ? "flex w-full rounded-md text-xs transition-colors outline-none disabled:pointer-events-none disabled:opacity-50"
-      : "flex w-full rounded-md text-xs transition-colors outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+      : "flex w-full rounded-md text-xs transition-colors outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50";
 
     const sizeClasses = {
       default: "h-8 px-3 py-1.5",

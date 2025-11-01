@@ -29,10 +29,10 @@ export default function Header() {
 	}
 
 	return (
-		<div className="h-12 flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-neutral-800">
+		<div className={`h-12 flex items-center justify-between px-4 py-2 border-b ${theme === "dark" ? "border-neutral-600" : "border-gray-200"}`}>
 			<h2 className="text-sm font-semibold">Markdown Editor - AI</h2>
 			<Menu>
-				<Menu.Trigger className="cursor-pointer">
+				<Menu.Trigger className="cursor-pointer focus-visible:outline-none focus-visible:ring-0">
 					{theme === "light" ? <Sun size={16} className="text-yellow-500" /> : theme === "dark" ? <Moon size={16} className="text-blue-500" /> : <Circle size={16} className="text-gray-500" />}
 				</Menu.Trigger>
 				<Menu.Content className="!w-30 !min-w-30">
